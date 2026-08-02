@@ -1,11 +1,14 @@
 import sqlite3
-
+from pathlib import Path
 import json
 
-DEFAULT_DB_PATH = "storage/minibot.db"
+BASE_DIR = Path(__file__).resolve().parent
+DEFAULT_DB_PATH = BASE_DIR / "minibot.db"
+
+
 #建立连接
 def get_conn():
-    conn = sqlite3.connect(DEFAULT_DB_PATH)
+    conn = sqlite3.connect(str(DEFAULT_DB_PATH))
     #改变数据库查询结果的返回格式
     conn.row_factory = sqlite3.Row 
     return conn
