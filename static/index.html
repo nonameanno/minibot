@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>minibot 测试</title>
+    </head>
+
+
+<body>
+    <h1>MiNiBot 对话</h1>
+    <div>
+        <input id="input" type="text" placeholder="输入你的问题" style="width: 400px; padding: 8px;">
+        <button id="btn">发送</button>
+        <button id="metrics-btn">📊点击查看token使用量</button>
+    </div>
+
+    <hr>
+    <pre id="output" style="white-space: pre-wrap;word-wrap: break-word;"></pre>
+    <div id="metrics-panel" style="margin-top: 20px; padding: 10px;border: 1px solid #ccc; display: none;"></div>
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const btn = document.getElementById('btn');
+        const SESSION_ID = 'frontend_test_1';
+        
+         // 辅助函数:定义在最外层,和其他 const 平级
+        function formatToolBreakdown(byName) {
+            const entries = Object.entries(byName);
+            if (entries.length === 0) return '';
+            const parts = entries.map(([name, cnt]) => `${name} × ${cnt}`);
+            return `(${parts.join(', ')})`;
+        }
+
+
+        btn.onclick = async () => {
+            const message = input.value.trim();  
+            if (!message) return; //输入为空就不发
+
+
+            // // 在页面上先显示"用户:xxx",再空一行准备接 AI 回复
+            output.textContent += `\n用户:${message}\nAI:`;
+            input.value = '';  //清空输入框
+            btn.disabled = true;  //禁用按钮，防止重复点
+
+            const response = await fetch('/chat',{
+                method:'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message:message,
+                    session_id:SESSION_ID,
+                }),
+            });
+
+            const reader = response.body.getReader();  //reader，你才coder能通过代码去控制“什么时候读一点数据”、“读完了没有”。
+            const decoder = new TextDecoder(); //翻译官，数据格式转换
+            let buffer = '';  //缓冲区,存"还没凑齐一条完整消息"的数据
+
+            while (true) {
+                const {done,value} = await reader.read();
+                if (done) break;
+
+                buffer +=decoder.decode(value,{stream:true});
+
+                 // 按 \n\n 切,每一段就是一条完整 SSE 消息(除了最后一段可能没结束)
+                const parts = buffer.split('\n\n');
+                buffer = parts.pop();      // 最后一段留下,可能没结束
+
+
+                for (const part of parts) {
+                    if (!part.startsWith('data:')) 
+                        continue;
+                    const dataStr = part.slice(5);   // // 去掉 "data: " 前缀
+                    if (dataStr ==='[DONE]')
+                        continue;
+
+                    try {
+                        const obj = JSON.parse(dataStr);
+                        output.textContent += obj.text; 
+                    } catch(e) {
+                         console.error('解析失败:', dataStr, e);
+                    }
+                }          
+        }
+          output.textContent += '\n';
+            btn.disabled = false;
+        };
+
+        const metricsBtn = document.getElementById('metrics-btn');
+        const metricsPanel = document.getElementById('metrics-panel');
+
+        metricsBtn.onclick = async () => {
+            const response = await fetch(`/metrics/${SESSION_ID}`)
+            const data = await response.json();
+
+            metricsPanel.style.display = 'block';
+            metricsPanel.innerHTML = `
+            <h3>📊 会话指标</h3>
+            <p>Session: <code>${data.session_id}</code></p>
+            <p>LLM 调用: <b>${data.llm_calls}</b> 次</p>
+            <p>Token 消耗: <b>${data.total_tokens}</b> (prompt ${data.prompt_tokens} / completion ${data.completion_tokens})</p>
+            <p>工具调用: <b>${data.tool_calls_total}</b> 次 ${formatToolBreakdown(data.tool_calls_by_name)}</p>
+            <p>Dream 触发: <b>${data.dream_count}</b> 次</p>
+        `;
+        }
+
+
+    </script>
+</body>
+</html>

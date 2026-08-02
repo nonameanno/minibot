@@ -1,0 +1,18 @@
+fastapi==0.115.0  #| Web 框架，写 API 接口 | 相当于餐厅的"点餐系统"，客户端发请求它接住 |
+
+uvicorn==0.30.0  #| ASGI 服务器，用来"跑" FastAPI | 光有点餐系统没用，还得有"服务员"把菜端出去 — 就是它 |
+
+openai==1.54.0  #| OpenAI 官方 SDK，也兼容 DeepSek 等 | 跟 LLM 说话的"翻译器" |
+
+httpx==0.27.0  #| 现代 HTTP 客户端，支持异步 | 相当于升级版的 requests，我们抓网页用它 |
+
+
+python-dotenv==1.0.0  #| 从 .env 文件读环境变量 | 把 API Key 从代码里隔离出来 |
+
+
+tavily-python==0.5.0  #Tavily搜索，专为llm agent设计
+
+pytest==8.3.0  # | 测试框架 | 后面写单元测试用 |
+
+
+pytest-asyncio==0.24.0  #| 让 pytest 支持异步测试 | FastAPI 是异步的，测试它得有这个 |

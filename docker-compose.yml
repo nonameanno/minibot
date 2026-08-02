@@ -1,0 +1,14 @@
+services:
+  minibot:
+    build: .
+    image: minibot:0.1
+    container_name: minibot-dev
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./storage:/app/storage
+      - ./memory:/app/memory
+      - ./notes:/app/notes
+    restart: unless-stopped

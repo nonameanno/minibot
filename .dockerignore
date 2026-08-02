@@ -1,0 +1,13 @@
+.env
+.venv
+__pycache__
+*.pyc
+*.pyo
+storage/minibot.db
+memory/
+notes/
+.git
+.gitignore
+MINIBOT_HANDOFF.md
+clean_test.py
+requirement.txt.lock
