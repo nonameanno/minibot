@@ -11,6 +11,8 @@
     <div>
         <input id="input" type="text" placeholder="输入你的问题" style="width: 400px; padding: 8px;">
         <button id="btn">发送</button>
+        <button id="newChatBtn">新对话</button>
+        <span id="sessionDisplay" style="font-size:12px;color:#888;margin-left:8px;"></span>
         <button id="metrics-btn">📊点击查看token使用量</button>
     </div>
 
@@ -21,7 +23,31 @@
         const output = document.getElementById('output');
         const input = document.getElementById('input');
         const btn = document.getElementById('btn');
-        const SESSION_ID = 'frontend_test_1';
+        
+
+
+        //生成一个新的session_id
+        function newSessionId() {
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).slice(2,6)
+            return `session_${timestamp}_${random}`;
+        }
+
+        function getOrCreateSessionId() {
+            const KEY = 'minibot_session_id';
+            let sid = localStorage.getItem(KEY);
+            if (!sid) {
+                sid = newSessionId();
+                localStorage.setItem(KEY, sid);
+            }
+            return sid;
+        }
+
+        let SESSION_ID = getOrCreateSessionId();
+        document.getElementById('sessionDisplay').textContent = 'Session: ' + SESSION_ID;
+
+
+
         
          // 辅助函数:定义在最外层,和其他 const 平级
         function formatToolBreakdown(byName) {
@@ -50,6 +76,16 @@
                     session_id:SESSION_ID,
                 }),
             });
+
+            const newChatBtn = document.getElementById('newChatBtn');
+            newChatBtn.onclick = () => {
+                const newSid = newSessionId();
+                localStorage.setItem('minibot_session_id', newSid);
+                SESSION_ID = newSid;
+                document.getElementById('sessionDisplay').textContent = 'Session: ' + newSid;
+                output.textContent = '';
+                input.focus();
+            };
 
             const reader = response.body.getReader();  //reader，你才coder能通过代码去控制“什么时候读一点数据”、“读完了没有”。
             const decoder = new TextDecoder(); //翻译官，数据格式转换

@@ -10,7 +10,7 @@ def record_llm_call(session_id:str,prompt_tokens:int,
         (session_id,"llm_call",prompt_tokens,completion_tokens,total_tokens)
     )
     conn.commit()
-    conn.close
+    conn.close()
 
 def record_tool_call(session_id:str,tool_name:str) ->None:
     "记录一次工具调用"
@@ -21,7 +21,7 @@ def record_tool_call(session_id:str,tool_name:str) ->None:
         (session_id,"tool_call",tool_name)
     )
     conn.commit()
-    conn.close
+    conn.close()
 
 def record_dream(session_id:str) ->None:
     """记录一次Dream触发"""

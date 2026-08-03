@@ -256,10 +256,10 @@ def stream_chat(user_message:str,session_id:str):
         usage_data = None
 
         #DEBUG 用来看每次发给服务器的messages长什么样
-        '''print(f"\n[DEBUG] 发送的 messages:")
+        print(f"\n[DEBUG] 发送的 messages:")
         for m in message_to_send:
             print(f"  {m}")
-            print()'''
+            print()
 
 
         stream = client.chat.completions.create(
