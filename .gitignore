@@ -12,11 +12,14 @@ storage/*.db
 memory/
 notes/
 
-#临时测试文件
-body.json
-
 #编辑器/系统
 .vscode/
 .idea/
 .DS_Store
 Thumb.db
+
+#开发者私人脚本 / 测试载荷
+*.ps1
+clean_test.py
+body.json
+requirement.txt.lock
